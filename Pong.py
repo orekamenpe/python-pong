@@ -91,15 +91,58 @@ class Ball(Actor):
 
         self.velocity *= speed
 
+class Player(Actor):
+
+    score = 0
+
+    def move(self, amount):
+        Actor.move(self, amount)
+        if self.position.y < 0:
+            self.position.y = 0
+        elif self.position.y > SCREEN_HEIGHT - self.texture.get_rect().height:
+            self.position.y = SCREEN_HEIGHT - self.texture.get_rect().height
+
+
 
 # functions
 def update(elapsedTime):
     timeFactor = elapseTime * 0.05  # redimension the time
+
+    player1.velocity.set_zero()
+    player2.velocity.set_zero()
+
+    keys = pygame.key.get_pressed()
+
+
+    if keys[pygame.K_w]:
+        player1.velocity.y -= PADDLE_SPEED
+    if keys[pygame.K_s]:
+        player1.velocity.y += PADDLE_SPEED
+
+    if keys[pygame.K_o]:
+        player2.velocity.y -= PADDLE_SPEED
+    if keys[pygame.K_l]:
+        player2.velocity.y += PADDLE_SPEED
+
+
     ball.move(ball.velocity * timeFactor)
+    player1.move(player1.velocity * timeFactor)
+    player2.move(player2.velocity * timeFactor)
+
+    if pygame.Rect.colliderect(ball.get_bounds(), player1.get_bounds()):
+        ball.velocity.x = math.fabs(ball.velocity.x)
+        ball.velocity.y += player1.velocity.y * SPIN_PERCENT
+    elif pygame.Rect.colliderect(ball.get_bounds(), player2.get_bounds()):
+        ball.velocity.x = -math.fabs(ball.velocity.x)
+        ball.velocity.y += player2.velocity.y * SPIN_PERCENT
 
 def draw():
     screen.fill(COLOR_BLACK)
+
     screen.blit(ball.texture, ball.get_bounds())
+    screen.blit(player1.texture, player1.get_bounds())
+    screen.blit(player2.texture, player2.get_bounds())
+
     pygame.display.flip()
 
 
@@ -115,7 +158,13 @@ playerTexture = pygame.image.load("compass.png")
 ball = Ball(ballTexture)
 ball.launch(BALL_SPEED)
 
-player = Actor(playerTexture)
+player1 = Player(playerTexture)
+player1.position.x = PADDLE_OFFSET
+player1.center_y()
+
+player2 = Player(playerTexture)
+player2.position.x = SCREEN_WIDTH - player2.get_bounds().width - PADDLE_OFFSET
+player2.center_y()
 
 # loop control & timing
 gameover = False
