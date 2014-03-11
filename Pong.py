@@ -66,6 +66,7 @@ class Actor:
 
 class Ball(Actor):
     def move(self, amount):
+        global player1Score, player2Score
         Actor.move(self, amount)
 
         if self.position.y < 0:
@@ -74,8 +75,12 @@ class Ball(Actor):
             self.velocity.y = - math.fabs(self.velocity.y)
 
         if self.get_bounds().right < 0:
+            player2.score += 1
+            player2Score = hudFont.render("%d" % player2.score, 1, COLOR_GREEN)
             self.launch(BALL_SPEED)  # call launch method
         elif self.get_bounds().left > SCREEN_WIDTH:
+            player1.score += 1
+            player1Score = hudFont.render("%d" % player1.score, 1, COLOR_GREEN)
             self.launch(BALL_SPEED)  # call launch method
 
     def launch(self, speed):
@@ -143,6 +148,9 @@ def draw():
     screen.blit(player1.texture, player1.get_bounds())
     screen.blit(player2.texture, player2.get_bounds())
 
+    screen.blit(player1Score, (TEXT_PADDING, TEXT_PADDING))
+    screen.blit(player2Score, (SCREEN_WIDTH - player2Score.get_width() - TEXT_PADDING, TEXT_PADDING))
+
     pygame.display.flip()
 
 
@@ -153,6 +161,10 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 # textures
 ballTexture = pygame.image.load("ball.png")
 playerTexture = pygame.image.load("compass.png")
+
+hudFont = pygame.font.Font(None, 32)
+player1Score = hudFont.render("0", 1, COLOR_GREEN)
+player2Score = hudFont.render("0", 1, COLOR_GREEN)
 
 # game objects
 ball = Ball(ballTexture)
