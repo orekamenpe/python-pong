@@ -82,7 +82,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # textures
 ballTexture = pygame.image.load("ball.png")
-playerTexture = pygame.image.load("ball.png")
+playerTexture = pygame.image.load("compass.png")
 
 # game objects
 ball = Actor(ballTexture)
