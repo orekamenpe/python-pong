@@ -1,6 +1,6 @@
 __author__ = 'orekamenpe'
 
-import pygame
+import pygame, random, math
 
 # game settings
 SCREEN_WIDTH = 640
@@ -64,6 +64,33 @@ class Actor:
         self.position = Vector2(SCREEN_WIDTH / 2 - self.texture.get_rect().width / 2,
                                 SCREEN_HEIGHT / 2 - self.texture.get_rect().height / 2)
 
+class Ball(Actor):
+    def move(self, amount):
+        Actor.move(self, amount)
+
+        if self.position.y < 0:
+            self.velocity.y = math.fabs(self.velocity.y)  # do not get stuck
+        elif self.position.y > SCREEN_HEIGHT - self.get_bounds().height:
+            self.velocity.y = - math.fabs(self.velocity.y)
+
+        if self.get_bounds().right < 0:
+            self.launch(BALL_SPEED)  # call launch method
+        elif self.get_bounds().left > SCREEN_WIDTH:
+            self.launch(BALL_SPEED)  # call launch method
+
+    def launch(self, speed):
+        self.center_xy()
+        var = random.uniform(-1, 1)
+
+        angle = math.pi / 2 + var
+        if random.randint(0, 1) == 0:
+            angle += math.pi
+
+        self.velocity.x = math.sin(angle)
+        self.velocity.y = math.cos(angle)
+
+        self.velocity *= speed
+
 
 # functions
 def update(elapsedTime):
@@ -85,8 +112,8 @@ ballTexture = pygame.image.load("ball.png")
 playerTexture = pygame.image.load("compass.png")
 
 # game objects
-ball = Actor(ballTexture)
-ball.velocity = Vector2(1, 2)
+ball = Ball(ballTexture)
+ball.launch(BALL_SPEED)
 
 player = Actor(playerTexture)
 
