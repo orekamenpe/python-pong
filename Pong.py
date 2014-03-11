@@ -15,17 +15,80 @@ PADDLE_OFFSET = 10
 BALL_SPEED = 3  # initial speed
 SPIN_PERCENT = 0.5
 
+# classes
+
+class Vector2:
+    def __init__(self, x = 0, y = 0):
+        self.x = x
+        self.y = y
+
+    def __add__(self, other):
+        if isinstance(other, Vector2):
+            return Vector2(self.x + other.x,
+                           self.y + other.y)
+        else:
+            return Vector2(self.x + other,
+                           self.y + other)
+
+    def __mul__(self, other):
+        if isinstance(other, Vector2):
+            return Vector2(self.x * other.x,
+                           self.y * other.y)
+        else:
+            return Vector2(self.x * other,
+                           self.y * other)
+
+    def set_zero(self):
+        self.x = 0
+        self.y = 0
+
+class Actor:
+    def __init__(self, texture):
+        self.position = Vector2()
+        self.velocity = Vector2()
+        self.texture = texture
+
+    def get_bounds(self):
+        return pygame.Rect(self.position.x,
+                           self.position.y,
+                           self.texture.get_rect().width,
+                           self.texture.get_rect().height)
+
+    def move(self, amount):
+        self.position += amount
+
+    def center_y(self):
+        self.position.y = SCREEN_HEIGHT / 2 - self.texture.get_rect().height / 2
+
+    def center_xy(self):
+        self.position = Vector2(SCREEN_WIDTH / 2 - self.texture.get_rect().width / 2,
+                                SCREEN_HEIGHT / 2 - self.texture.get_rect().height / 2)
+
+
 # functions
 def update(elapsedTime):
-    return None
+    timeFactor = elapseTime * 0.05  # redimension the time
+    ball.move(ball.velocity * timeFactor)
 
 def draw():
-    return None
+    screen.fill(COLOR_BLACK)
+    screen.blit(ball.texture, ball.get_bounds())
+    pygame.display.flip()
 
 
 # initialization
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+# textures
+ballTexture = pygame.image.load("ball.png")
+playerTexture = pygame.image.load("ball.png")
+
+# game objects
+ball = Actor(ballTexture)
+ball.velocity = Vector2(1, 2)
+
+player = Actor(playerTexture)
 
 # loop control & timing
 gameover = False
